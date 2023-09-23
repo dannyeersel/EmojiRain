@@ -161,7 +161,7 @@ mContainer.setDropDuration(2500);
 mContainer.setDropFrequency(500);
 
 // startAnimation for love emoji  ( EMOJI drop from top)
-mContainer.startAnimation(EmojiRainLayout.AnimationType.drop);
+mContainer.startAnimation(EmojiRainLayout.AnimationType.DROP);
 isEmojiAnimationActive = true;
 
     }
