@@ -6,17 +6,17 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.support.annotation.DrawableRes;
-import android.support.percent.PercentFrameLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pools;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.util.Pools;
 
 import com.luolc.emojirain.utils.Randoms;
 
@@ -36,8 +36,8 @@ import rx.subscriptions.CompositeSubscription;
  * @since 2016/12/13
  */
 
-public class EmojiRainLayout extends PercentFrameLayout {
-
+public class EmojiRainLayout extends FrameLayout {
+    Context context;
     private static int EMOJI_STANDARD_SIZE;
 
     private static final float RELATIVE_DROP_DURATION_OFFSET = 0.25F;
@@ -51,7 +51,7 @@ public class EmojiRainLayout extends PercentFrameLayout {
     private static final int DEFAULT_DROP_FREQUENCY = 500;
 
     private CompositeSubscription mSubscriptions;
-
+    TranslateAnimation  translateAnimation;
     private int mWindowHeight;
 
     private int mEmojiPer;
@@ -67,7 +67,7 @@ public class EmojiRainLayout extends PercentFrameLayout {
     private Pools.SynchronizedPool<ImageView> mEmojiPool;
 
     {
-        EMOJI_STANDARD_SIZE = dip2px(36);
+        EMOJI_STANDARD_SIZE = dip2px(45);
     }
 
     public EmojiRainLayout(Context context) {
@@ -113,6 +113,8 @@ public class EmojiRainLayout extends PercentFrameLayout {
 
     public void clearEmojis() {
         mEmojis.clear();
+        currentAnimationType = AnimationType.NONE;
+
     }
 
     /**
@@ -123,16 +125,19 @@ public class EmojiRainLayout extends PercentFrameLayout {
         mSubscriptions.clear();
     }
 
-    /**
-     * Start dropping animation.
-     * The animation will last for n flow(s), which n is {@code mDuration}
-     * divided by {@code mDropFrequency}.
-     * The interval between two flows is {@code mDropFrequency}.
-     * There will be {@code mEmojiPer} emojis dropping in each flow.
-     * The dropping animation for a specific emoji is a random value with mean
-     * {@code mDropAverageDuration} and relative offset {@code RELATIVE_DROP_DURATION_OFFSET}.
-     */
-    public void startDropping() {
+
+    public AnimationType currentAnimationType = AnimationType.NONE;
+
+    public enum AnimationType {
+        NONE, MONEY_DROP, LOVE ,EMOJI// Add more animation types as needed
+    }
+
+    public void startAnimation(AnimationType animationType) {
+        if (animationType == AnimationType.NONE) {
+            return;
+        }
+
+        currentAnimationType = animationType;
         initEmojisPool();
 
         Randoms.setSeed(7);
@@ -143,9 +148,11 @@ public class EmojiRainLayout extends PercentFrameLayout {
                 .map(i -> mEmojiPool.acquire())
                 .filter(e -> e != null)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::startDropAnimationForSingleEmoji, Throwable::printStackTrace);
+                .subscribe(this::startDropAnimation, Throwable::printStackTrace);
         mSubscriptions.add(subscription);
     }
+
+
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.EmojiRainLayout);
@@ -162,12 +169,30 @@ public class EmojiRainLayout extends PercentFrameLayout {
         ta.recycle();
     }
 
-    private void startDropAnimationForSingleEmoji(final ImageView emoji) {
-        final TranslateAnimation translateAnimation = new TranslateAnimation(
-                Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, Randoms.floatAround(0, 5),
-                Animation.RELATIVE_TO_PARENT, 0,
-                Animation.ABSOLUTE, mWindowHeight);
+
+    private void startDropAnimation(final ImageView emoji) {
+
+
+        if (currentAnimationType == AnimationType.MONEY_DROP) {
+           translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0,
+                    Animation.RELATIVE_TO_SELF, Randoms.floatAround(0, 5),
+                    Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_PARENT,1.2f);
+
+        }else if (currentAnimationType == AnimationType.LOVE) {
+            translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_PARENT, 0.7f,
+                    Animation.RELATIVE_TO_SELF, Randoms.floatAround(0, 3),
+                    Animation.RELATIVE_TO_PARENT, 1.1f, // Start at the bottom
+                    Animation.RELATIVE_TO_PARENT, 0.0f); // End at the top
+        }else if (currentAnimationType == AnimationType.EMOJI) {
+            translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_PARENT, 0,
+                    Animation.RELATIVE_TO_SELF, Randoms.floatAround(0, 5),
+                    Animation.RELATIVE_TO_PARENT, 1.2f, // Start at the bottom
+                    Animation.RELATIVE_TO_PARENT, 0.0f); // End at the top
+        }
         translateAnimation.setDuration((int)
                 (mDropAverageDuration * Randoms.floatAround(1, RELATIVE_DROP_DURATION_OFFSET)));
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -183,6 +208,8 @@ public class EmojiRainLayout extends PercentFrameLayout {
             public void onAnimationRepeat(Animation animation) {}
         });
         emoji.startAnimation(translateAnimation);
+
+
     }
 
     private int getWindowHeight() {
@@ -214,16 +241,19 @@ public class EmojiRainLayout extends PercentFrameLayout {
     private ImageView generateEmoji(Drawable emojiDrawable) {
         ImageView emoji = new ImageView(getContext());
         emoji.setImageDrawable(emojiDrawable);
+
         final int width = (int) (EMOJI_STANDARD_SIZE * (1.0 + Randoms.positiveGaussian()));
         final int height = (int) (EMOJI_STANDARD_SIZE * (1.0 + Randoms.positiveGaussian()));
-        final LayoutParams params = new LayoutParams(width, height);
-        params.getPercentLayoutInfo().leftMarginPercent = Randoms.floatStandard();
+
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        params.leftMargin = width; // Set left margin to 0 to make the emoji span the full width
         params.topMargin = -height;
-        params.leftMargin = ((int) (-0.5F * width));
+
         emoji.setLayoutParams(params);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            emoji.setElevation(100);
-        }
+
+        emoji.setElevation(100);
+
         return emoji;
     }
 
