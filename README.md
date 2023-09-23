@@ -182,7 +182,7 @@ mContainer.stopDropping();
 
 ## Compatibility
 
-Android midSdkVersion 14.
+Android midSdkVersion 24.
 
 ## License
 
