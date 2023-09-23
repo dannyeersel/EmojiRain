@@ -4,6 +4,8 @@
 
 <img src='https://raw.githubusercontent.com/Luolc/EmojiRain/master/others/dropping-demo.gif' width="300px" style='border: #f1f1f1 solid 1px'/>
 
+
+
 Hey, it's raining emoji!
 
 This is a really simple and funny animation for Android. You could find similar animations when sending "Happy birthday" or something else special in WeChat app.
