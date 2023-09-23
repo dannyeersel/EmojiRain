@@ -129,7 +129,7 @@ public class EmojiRainLayout extends FrameLayout {
     public AnimationType currentAnimationType = AnimationType.NONE;
 
     public enum AnimationType {
-        NONE, MONEY_DROP, LOVE ,EMOJI// Add more animation types as needed
+        NONE, DROP, LOVE ,EMOJI// Add more animation types as needed
     }
 
     public void startAnimation(AnimationType animationType) {
@@ -173,12 +173,12 @@ public class EmojiRainLayout extends FrameLayout {
     private void startDropAnimation(final ImageView emoji) {
 
 
-        if (currentAnimationType == AnimationType.MONEY_DROP) {
+        if (currentAnimationType == AnimationType.DROP) {
            translateAnimation = new TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 0,
                     Animation.RELATIVE_TO_SELF, Randoms.floatAround(0, 5),
-                    Animation.RELATIVE_TO_PARENT, 0.0f,
-                    Animation.RELATIVE_TO_PARENT,1.2f);
+                    Animation.RELATIVE_TO_PARENT, 0.0f, // Start at the top
+                    Animation.RELATIVE_TO_PARENT,1.2f);// End at the bottom
 
         }else if (currentAnimationType == AnimationType.LOVE) {
             translateAnimation = new TranslateAnimation(
