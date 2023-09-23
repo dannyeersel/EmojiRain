@@ -247,7 +247,7 @@ public class EmojiRainLayout extends FrameLayout {
 
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-        params.leftMargin = width; // Set left margin to 0 to make the emoji span the full width
+        params.leftMargin = width;
         params.topMargin = -height;
 
         emoji.setLayoutParams(params);
