@@ -35,17 +35,10 @@ Config in layout. `EmojiRainLayout` inherits from `FrameLayout`. You can just us
 
 ```xml
 <com.luolc.emojirain.EmojiRainLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/group_emoji_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:per="10"
-        app:duration="7200"
-        app:dropDuration="2400"
-        app:dropFrequency="500"
-        tools:context="com.luolc.emojirain.sample.MainActivity">
+        android:layout_height="match_parent">
+        </com.luolc.emojirain.EmojiRainLayout>
 
     <TextView
             android:text="Hello world!"
@@ -67,26 +60,110 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // bind view
-        mContainer = (EmojiRainLayout) findViewById(R.id.group_emoji_container);
+   mContainer = findViewById(R.id.group_emoji_container);
 
-        // add emoji sources
-        mContainer.addEmoji(R.drawable.emoji_1_3);
-        mContainer.addEmoji(R.drawable.emoji_2_3);
-        mContainer.addEmoji(R.drawable.emoji_3_3);
-        mContainer.addEmoji(R.drawable.emoji_4_3);
-        mContainer.addEmoji(R.drawable.emoji_5_3);
+// add emoji sources
+    mContainer.addEmoji(bitmap);
 
-        // set emojis per flow, default 6
-        mContainer.setPer(10);
+ // set emojis per flow, default 6
+    mContainer.setPer(4);
 
-        // set total duration in milliseconds, default 8000
-        mContainer.setDuration(7200);
+ // set total duration in milliseconds, default 8000
+    mContainer.setDuration(3000);
 
-        // set average drop duration in milliseconds, default 2400
-        mContainer.setDropDuration(2400);
+ // set average drop duration in milliseconds, default 2400
+   mContainer.setDropDuration(2500);
 
-        // set drop frequency in milliseconds, default 500
-        mContainer.setDropFrequency(500);
+ // set drop frequency in milliseconds, default 500
+    mContainer.setDropFrequency(500);
+
+ // 1. getting emoji from url
+
+  // check if Emoji Animation is Active
+if (isEmojiAnimationActive) {
+   mContainer.stopDropping();
+    mContainer.clearEmojis();
+    isEmojiAnimationActive = false;
+    }
+
+
+ Picasso.get().load(Emoji_url).into(new Target() {
+   @Override
+   public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+   // add emoji url
+    mContainer.addEmoji(bitmap);
+
+
+    mContainer.setPer(4)
+    mContainer.setDuration(3000);
+   mContainer.setDropDuration(2500);
+    mContainer.setDropFrequency(500);
+
+  // startAnimation for emoji  ( EMOJI starts from botton)
+   mContainer.startAnimation(EmojiRainLayout.AnimationType.EMOJI);
+
+   isEmojiAnimationActive = true;
+ }
+ @Override
+ public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+  // Handle the case where loading the image fails
+  }
+ @Override
+ public void onPrepareLoad(Drawable placeHolderDrawable) {
+  // Handle any preparations or placeholders if needed
+    }
+});
+
+ // 2. getting love emoji from drawable
+
+ if (isEmojiAnimationActive) {
+
+  mContainer.stopDropping();
+  mContainer.clearEmojis();
+  isEmojiAnimationActive = false;
+  }
+
+// add emoji sources
+mContainer.addEmoji(R.drawable.love_red);
+mContainer.addEmoji(R.drawable.love_blue);
+mContainer.addEmoji(R.drawable.love_purple);
+mContainer.addEmoji(R.drawable.love_yellow);
+mContainer.addEmoji(R.drawable.love_orange);
+
+mContainer.setPer(6);
+mContainer.setDuration(3000);
+mContainer.setDropDuration(2500);
+mContainer.setDropFrequency(500);
+
+// startAnimation for love emoji  ( EMOJI starts from botton)
+mContainer.startAnimation(EmojiRainLayout.AnimationType.LOVE);
+isEmojiAnimationActive = true;
+
+
+
+ // 3. getting drop emoji from drawable
+
+ if (isEmojiAnimationActive) {
+
+  mContainer.stopDropping();
+  mContainer.clearEmojis();
+  isEmojiAnimationActive = false;
+  }
+
+// add emoji sources
+mContainer.addEmoji(R.drawable.love_red);
+mContainer.addEmoji(R.drawable.love_blue);
+
+mContainer.setPer(6);
+mContainer.setDuration(3000);
+mContainer.setDropDuration(2500);
+mContainer.setDropFrequency(500);
+
+// startAnimation for love emoji  ( EMOJI drop from top)
+mContainer.startAnimation(EmojiRainLayout.AnimationType.drop);
+isEmojiAnimationActive = true;
+
     }
 }
 ```
