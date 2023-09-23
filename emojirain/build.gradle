@@ -29,16 +29,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:percent:$rootProject.supportLibraryVersion"
-    testCompile 'junit:junit:4.12'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.test.ext:junit:1.1.5'
 
-    compile "io.reactivex:rxjava:$rootProject.rxjavaVersion"
-    compile "io.reactivex:rxandroid:$rootProject.rxandroidVersion"
-    compile "com.annimon:stream:$rootProject.streamVersion";
+    implementation "io.reactivex:rxjava:1.1.6"
+    implementation "io.reactivex:rxandroid:1.2.1"
+    implementation 'com.annimon:stream:1.2.2'
+
+
+
+
+    
 }
 
 ext {
